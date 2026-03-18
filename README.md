@@ -109,3 +109,10 @@ The dataset files are 2.5GB total — too large to upload to GitHub. We created 
 
 - Step 7: Pushed code to GitHub
 Pushed the updated model/train.py, requirements.txt and .gitignore to GitHub with the commit message "Day 2: data loading function complete, 2917 samples".
+
+
+
+# DEVELOPER 2:
+
+
+# DEVELOPER 3:

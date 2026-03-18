@@ -20,16 +20,16 @@ DysVoice is an AI system that listens to dysarthric speech (speech from people w
 
 We also created empty files as placeholders so everyone knows what they need to fill in:
 
-config.py — shared settings file used by all 3 developers
-requirements.txt — list of all libraries the project needs
-main.py — the master file that connects everything together
-model/train.py — code to train the AI model
-model/evaluate.py — code to test how accurate the model is
-audio/record.py — code to record from microphone
-audio/denoise.py — code to clean up background noise
-inference/transcribe.py — code to convert speech to text
-output/speak.py — code to convert text to speech
-output/display.py — code to show text on screen
+1. config.py — shared settings file used by all 3 developers
+2. requirements.txt — list of all libraries the project needs
+3. main.py — the master file that connects everything together
+4. model/train.py — code to train the AI model
+5. model/evaluate.py — code to test how accurate the model is
+6. audio/record.py — code to record from microphone
+7. audio/denoise.py — code to clean up background noise
+8. inference/transcribe.py — code to convert speech to text
+9. output/speak.py — code to convert text to speech
+10. output/display.py — code to show text on screen
 
 Also created __init__.py files in each folder — these are empty files that tell Python "this folder is a package you can import code from."
 - Step 4: Wrote config.py
@@ -78,21 +78,6 @@ Used the built-in extraction tool to extract both files
 This created two folders: F_dys and M_dys inside the Dysvoice project folder
 
 - Step 3: Explored the dataset structure
-After extracting we found this structure:
-F_dys/
-├── F01/          ← Female dysarthric speaker 1
-│   └── Session1/
-│       ├── wav_headMic/    ← audio files (.wav)
-│       └── prompts/        ← transcript files (.txt)
-├── F03/          ← Female dysarthric speaker 3
-└── F04/          ← Female dysarthric speaker 4
-
-M_dys/
-├── M01/          ← Male dysarthric speaker 1
-├── M02/
-├── M03/
-├── M04/
-└── M05/
 Total: 8 dysarthric speakers across both folders.
 Each .wav file has a matching .txt file with the same number. For example 0001.wav contains the audio of someone saying what is written in 0001.txt.
 

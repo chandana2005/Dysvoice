@@ -1,4 +1,5 @@
 __pycache__/
+<<<<<<< HEAD
 *.pyc
 *.pyo
 *.pyd
@@ -6,3 +7,8 @@ __pycache__/
 test_recording.wav
 test_raw.wav
 test_clean.wav
+=======
+*.pyc__pycache__/ 
+*.pyc 
+>>>>>>> 23cff3ac9562f703825559b5beefe914aaa0f426
+test_samples/

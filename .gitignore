@@ -1,0 +1,10 @@
+```
+F_dys/
+M_dys/
+F_dys.bz2
+M_tar.bz2
+*.wav
+*.bz2
+*.tar
+__pycache__/
+*.pyc

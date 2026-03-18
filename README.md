@@ -201,9 +201,7 @@ Ran python -m inference.transcribe test_samples\array0001.wav in the terminal. C
 Pushed inference/transcribe.py and the updated .gitignore with commit message "Day 4: transcribe.py complete, tested with TORGO samples".
 
 # DEVELOPER 3:
-Here's your Day 1 log for Person 3:
 
----
 
 **Day 1 — Person 3 (Output & Integration)**
 

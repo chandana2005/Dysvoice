@@ -7,4 +7,5 @@ M_tar.bz2
 *.bz2
 *.tar
 __pycache__/
-*.pyc
+*.pyc__pycache__/ 
+*.pyc 

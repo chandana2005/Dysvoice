@@ -4,6 +4,7 @@ AI-Based Dysarthric Speech Assistance System
 # DEVELOPER 1:
 ## Day 1
 **What is this project?**
+
 DysVoice is an AI system that listens to dysarthric speech (speech from people with conditions like cerebral palsy that affect how they talk) and converts it into clear text and spoken output. Think of it like a translator between dysarthric speech and normal communication.
 
 - Step 1: Created the GitHub Repository
@@ -44,24 +45,27 @@ Also created __init__.py files in each folder — these are empty files that tel
 - Step 5: Wrote requirements.txt
   This file lists every external library the project needs. When teammates clone the repo they run pip install -r requirements.txt and Python automatically downloads and installs everything. Libraries we need:
 
-**.** torch — the deep learning engine that powers the AI
-**.** transformers — loads the Whisper model from HuggingFace
-**.** datasets — helps load and organise audio data
-**.** librosa — loads audio files and converts sample rates
-**.** soundfile — reads and writes audio files
-**.** noisereduce — removes background noise from audio
-**.** pyaudio — accesses the microphone
-**.** pyttsx3 — converts text to speech
-**.** evaluate — calculates how accurate the model is
-**.** jiwer — calculates Word Error Rate (how many words the model gets wrong)
+ torch — the deep learning engine that powers the AI
+ transformers — loads the Whisper model from HuggingFace
+ datasets — helps load and organise audio data
+ librosa — loads audio files and converts sample rates
+ soundfile — reads and writes audio files
+ noisereduce — removes background noise from audio
+ pyaudio — accesses the microphone
+ pyttsx3 — converts text to speech
+ evaluate — calculates how accurate the model is
+ jiwer — calculates Word Error Rate (how many words the model gets wrong)
 - Step 6: Pushed everything to GitHub
 - Step 7: Added teammates as collaborators
 
 ## Day 2
 **Goal of Day 2**
+
 Write the data loading function — the code that reads all the audio files and their matching transcripts and prepares them for AI training.
 **What is the TORGO Dataset?**
+
 TORGO is a research dataset created by the University of Toronto. It contains recordings of real people with dysarthria (speech impairment) speaking words and sentences into a microphone. Each audio file has a matching text file that says exactly what the person said. This is called a labelled dataset — the AI needs both the audio AND the correct text to learn from.
+
 - Step 1: Downloaded the TORGO dataset
 Went to the official TORGO website at the University of Toronto
 Downloaded F_dys.bz2 (female dysarthric speakers) and M_dys.bz2 (male dysarthric speakers)
@@ -102,15 +106,15 @@ Some transcripts had inline instructions like "tear [as in tear up that paper]" 
 - Step 5: Wrote the data loading function in model/train.py
 This function does the following automatically:
 
-. Goes into every speaker folder (F01, F03, F04, M01-M05)
-. Goes into every session folder inside each speaker
-. Finds the wav_headMic folder (audio) and prompts folder (transcripts)
-. For every transcript file, reads the text inside
-. Skips it if it starts with '[' (instruction prompt)
-. Removes any inline bracket instructions from the text
-. Finds the matching .wav audio file with the same number
-. Adds the pair (audio path, transcript text) to a list
-. At the end, returns the complete list of 2917 audio-transcript pairs
+- Goes into every speaker folder (F01, F03, F04, M01-M05)
+- Goes into every session folder inside each speaker
+- Finds the wav_headMic folder (audio) and prompts folder (transcripts)
+- For every transcript file, reads the text inside
+- Skips it if it starts with '[' (instruction prompt)
+- Removes any inline bracket instructions from the text
+- Finds the matching .wav audio file with the same number
+- Adds the pair (audio path, transcript text) to a list
+- At the end, returns the complete list of 2917 audio-transcript pairs
 
 - Result
 Successfully loaded 2917 clean audio-transcript pairs from 8 dysarthric speakers.

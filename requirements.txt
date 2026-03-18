@@ -1,10 +1,9 @@
-
-torch
-transformers
-datasets
-librosa
-soundfile
-noisereduce
+Torch
+Transformers
+Datasets
+Librosa
+Soundfile
+Noisereduce
 pyaudio
 pyttsx3
 evaluate

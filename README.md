@@ -373,4 +373,49 @@ Pushed inference/transcribe.py and the updated .gitignore with commit message "D
 
 - Step 5: Pushed to GitHub
    Ran `git add .`, `git commit -m "Day 1 Speak complete"`, and `git push` to upload the completed `speak.py` to the shared repository so the team can see progress.
->>>>>>> 7ed49f138a2e6784649d97290099202df8e8f1db
+
+---
+
+**Day 2**
+**Goal of Day 2**
+Finalise `speak.py` with clean, focused function signatures, write `output/display.py` with a terminal fallback, and push both completed modules to GitHub so they are ready for Person 2 to call from `main.py`.
+
+**What is pyttsx3?**
+`pyttsx3` is a Python text-to-speech library that works completely offline — no internet connection needed. It uses the operating system's built-in speech engine: SAPI5 on Windows, nsss on Mac, and espeak on Linux and the Raspberry Pi. This is important for DysVoice because the final device must work without Wi-Fi. The library takes any text string and converts it into spoken audio through the system's speakers in real time.
+
+**Step 1: Polished speak.py from Day 1**
+Reviewed the `speak.py` written on Day 1 and cleaned it up. Removed unused imports (`numpy`, `wave`, `tempfile`) that were carried over but not actually needed. Tightened the `speak()` function so it does exactly one thing — takes a string, speaks it aloud, returns nothing. This clean, focused signature is important because `main.py` will call `speak(text)` directly and must not receive any return value that could cause errors.
+
+**Step 2: Understood what the function signatures must look like**
+The plan document specifies the exact function signatures that `main.py` will use. Before writing anything, confirmed these two signatures for `speak.py`:
+
+- `speak(text)` → takes a string, speaks it aloud, returns `None`
+- `save_audio(text, output_path)` → takes a string and a file path, saves the speech as a `.wav` file, returns the file path
+
+These cannot be renamed or restructured. Person 3's own `main.py` depends on them being exactly this shape.
+
+**Step 3: Wrote save_audio() helper inside speak.py**
+Added the `save_audio()` function which uses `pyttsx3`'s built-in `save_to_file()` method. Instead of playing audio through the speakers, this saves the TTS output as a `.wav` file to a given path on disk. This is the demo backup strategy — if the live microphone or TTS fails on demo day, pre-generated `.wav` files of common phrases like "please bring me water" can be played on demand without running the full pipeline. Tested it by calling `save_audio("This is a saved audio clip for the demo.", "test_output.wav")` and confirmed the file appeared on disk.
+
+**Step 4: Wrote output/display.py with terminal fallback**
+Created a new file `output/display.py`. This module has one job — show the transcribed text on screen after the AI produces it. Since the Raspberry Pi and OLED hardware have not arrived yet, wrote it to print to the terminal as a fallback. The terminal output is formatted inside a clear box so it is easy to read during the demo:
+
+```
+┌──────────────────────────────────────────────────┐
+│  Transcript: please bring me water               │
+└──────────────────────────────────────────────────┘
+```
+
+The key design decision was to add an `OLED_ENABLED` flag at the top of the file. When hardware arrives, flipping this flag to `True` and uncommenting the OLED library block will switch the module from terminal output to physical screen output — without changing anything in `main.py`. The function signature `display_text(text)` stays identical either way.
+
+**Step 5: Understood what OLED hardware integration will look like**
+The OLED screen is a small display that will be attached to the Raspberry Pi via I2C connection. It will use the `luma.oled` library with an `ssd1306` driver. Since the hardware is not here yet, the OLED import lines were written but left commented out inside `display.py`. When the Pi arrives, these lines get uncommented and the terminal print gets removed — everything else stays the same.
+
+**Step 6: Tested both files on the laptop**
+Ran `python output/speak.py` — confirmed all test sentences were spoken clearly through the laptop speakers. Ran `python output/display.py` — confirmed the formatted transcript box printed correctly in the terminal for all four test phrases. Both files ran without errors.
+
+**Step 7: Pushed to GitHub**
+Ran `git add .`, `git commit -m "Day 2: speak.py finalised, display.py written with terminal fallback"`, and `git push` to upload both completed output modules to the shared repository.
+
+**Result**
+Both output modules are complete and pushed. `speak.py` has clean, tested function signatures ready for `main.py` to call. `display.py` works in terminal mode now and is structured to switch to OLED with a single flag change when hardware arrives. Person 3 can now move on to writing `main.py` on Day 3 with both output modules fully in place.

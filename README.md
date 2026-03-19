@@ -191,6 +191,75 @@ after hitting Colab's daily GPU limit.
   Epochs 7, 8, 9, 10 running on Kaggle GPU.
   Final model will be saved to /kaggle/working/dysvoice_whisper.pt
 
+## Day 4
+
+### **Goal of Day 4**
+Download the trained model from Kaggle, write model/evaluate.py to test 
+accuracy, and share the model file with teammates.
+
+### **What is Evaluation?**
+After training, we need to verify the model actually works on speech it 
+has never heard before. We test on two TORGO speakers who were not used 
+during training:
+
+- **M04** — male dysarthric speaker (mild/moderate)
+- **F03** — female dysarthric speaker (moderate)
+
+Testing on unseen data gives us a realistic measure of how the model 
+will perform in the real world.
+
+### **What is WRA and WER?**
+Two metrics are used to measure speech recognition accuracy:
+
+- **WRA (Word Recognition Accuracy)** — percentage of words the model 
+  gets correct. Higher is better. Target: 85%+
+- **WER (Word Error Rate)** — percentage of words the model gets wrong. 
+  Lower is better. WER = 1 - WRA
+
+These are calculated automatically using the `jiwer` library by comparing 
+the model's predicted transcript against the correct transcript.
+
+### **Steps Completed**
+
+- Step 1: Downloaded trained model from Kaggle Output section
+  After Version #2 completed all 10 epochs, downloaded 
+  dysvoice_whisper.pt (967MB) from the Kaggle Output tab
+
+- Step 2: Placed model in correct location
+  Saved dysvoice_whisper.pt to model/ folder inside the Dysvoice project
+
+- Step 3: Wrote model/evaluate.py
+  This file does the following:
+  1. Loads the trained model and Whisper processor
+  2. Loads test audio files from M04 and F03 speakers
+  3. Runs each audio file through the model to get predicted text
+  4. Compares predicted text against correct transcript
+  5. Calculates WRA and WER using jiwer library
+  6. Prints results with an example showing actual vs predicted text
+
+- Step 4: Ran evaluation and confirmed accuracy
+  Results exceeded the 85% target significantly:
+
+### **Accuracy Results**
+| Speaker | Severity | WRA | WER | Samples Tested |
+|---------|----------|-----|-----|----------------|
+| M04 | Mild/Moderate | 96.30% | 3.70% | 10 |
+| F03 | Moderate | 100.00% | 0.00% | 10 |
+
+**Target was 85% — model achieved 96-100%** ✅
+
+### **Model File**
+The trained model file dysvoice_whisper.pt is 967MB — too large for 
+GitHub. Download it from Google Drive:
+https://drive.google.com/drive/folders/1rtKe_JsFFLvp0zqZ8ohyRvxXvRcqMYD2?usp=sharing
+
+Place it in the model/ folder before running any code:
+```
+Dysvoice/
+└── model/
+    └── dysvoice_whisper.pt  ← place here
+```
+
 
 # DEVELOPER 2:
 ## Day 1

@@ -15,22 +15,24 @@ except ModuleNotFoundError:
     MODEL_PATH  = "model/dysvoice_whisper.pt"
     DEVICE      = "cpu"
 
-print("[transcribe] Loading processor...")
+print(f"[transcribe] Loading processor from {MODEL_NAME}")
 _processor = WhisperProcessor.from_pretrained(MODEL_NAME)
 
-print("[transcribe] Loading base model...")
+print(f"[transcribe] Loading base model architecture from {MODEL_NAME}")
 _model = WhisperForConditionalGeneration.from_pretrained(MODEL_NAME)
 
 if os.path.isfile(MODEL_PATH):
     print(f"[transcribe] Applying fine-tuned weights from {MODEL_PATH}")
     state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
     _model.load_state_dict(state_dict)
-    print("[transcribe] Fine-tuned model loaded successfully")
+    print(f"[transcribe] Fine-tuned model loaded successfully")
 else:
     print(f"[transcribe] WARNING - {MODEL_PATH} not found, using base model")
 
 _model.to(DEVICE)
 _model.eval()
+_model.config.forced_decoder_ids = None
+_processor.tokenizer.forced_decoder_ids = None
 
 def transcribe(audio):
     if audio.size == 0:
@@ -49,7 +51,7 @@ def transcribe(audio):
 if __name__ == "__main__":
     import sys
     print("=" * 50)
-    print("transcribe.py - Whisper transcription test")
+    print("transcribe.py  -  Whisper transcription test")
     print("=" * 50)
     if len(sys.argv) > 1:
         import librosa

@@ -110,6 +110,86 @@ The dataset files are 2.5GB total — too large to upload to GitHub. We created 
 - Step 7: Pushed code to GitHub
 Pushed the updated model/train.py, requirements.txt and .gitignore to GitHub with the commit message "Day 2: data loading function complete, 2917 samples".
 
+## Day 3
+### Goal of Day 3
+Write the audio preprocessing function, write the Whisper fine-tuning 
+training loop, and run training on a free cloud GPU overnight.
+
+### **What is Preprocessing?**
+Before the AI model can learn from audio, the raw .wav files need to be 
+converted into a format Whisper understands. This is called preprocessing:
+
+1. Load the audio file using librosa
+2. Resample to 16000Hz (16kHz) — Whisper requires this exact sample rate
+3. Extract log-Mel features using Whisper's own processor — this converts 
+   the audio waveform into a visual representation of sound frequencies 
+   that the model can learn from
+
+This is a lossless conversion — no information is lost, just reformatted.
+
+### **What is Fine-Tuning?**
+Whisper is already pre-trained on 680,000 hours of normal speech. 
+Fine-tuning means we take this already-smart model and teach it the 
+specific patterns of dysarthric speech using our TORGO dataset. Think 
+of it like a doctor who already knows medicine, now specialising in 
+a specific condition.
+
+### **What is Loss?**
+During training, the model makes a prediction for each audio file and 
+compares it to the correct transcript. The difference between the 
+prediction and the correct answer is called loss:
+
+- High loss = model got it very wrong
+- Low loss = model got it right
+- The goal is to reduce loss over time through 10 epochs of training
+
+### **What is an Epoch?**
+One epoch means the model has seen all 2917 samples once. We run 
+10 epochs — so the model sees the full dataset 10 times, getting 
+better each time.
+
+### **Why Google Colab and Kaggle?**
+Training a deep learning model requires a GPU (Graphics Processing Unit) 
+which is extremely expensive hardware. Our laptops don't have one. 
+Google Colab and Kaggle both offer free cloud GPUs:
+
+- Google Colab — free Tesla T4 GPU, ~12 hours per day
+- Kaggle — free Tesla T4 x2 GPU, 30 hours per week
+
+We used Colab for epochs 1-6 and switched to Kaggle for epochs 7-10 
+after hitting Colab's daily GPU limit.
+
+### **Steps Completed**
+
+- Step 1: Added preprocessing function to model/train.py
+  Loads each .wav file, resamples to 16kHz, extracts Mel features 
+  using WhisperProcessor
+
+- Step 2: Added training loop to model/train.py
+  Loads whisper-small from HuggingFace, moves it to GPU, runs 10 epochs,
+  saves checkpoints every 2 epochs so progress is not lost if 
+  GPU disconnects
+
+- Step 3: Set up Google Colab
+  Created new notebook, switched runtime to T4 GPU, mounted Google Drive,
+  uploaded TORGO dataset to Drive, ran training
+
+- Step 4: Training ran epochs 1-6 on Colab
+  Loss dropped from 2.69 → 0.0001 showing significant learning.
+  Checkpoint saved to Google Drive after every 2 epochs.
+
+- Step 5: Colab GPU limit hit after epoch 6
+  Free Colab GPU has a daily usage limit. Switched to Kaggle 
+  to continue training.
+
+- Step 6: Set up Kaggle notebook
+  Uploaded TORGO dataset and epoch 6 checkpoint to Kaggle as a dataset.
+  Switched accelerator to T4 x2 GPU. Loaded checkpoint and resumed 
+  training from epoch 7.
+
+- Step 7: Training resumed on Kaggle from epoch 7
+  Epochs 7, 8, 9, 10 running on Kaggle GPU.
+  Final model will be saved to /kaggle/working/dysvoice_whisper.pt
 
 
 # DEVELOPER 2:

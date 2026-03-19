@@ -110,6 +110,158 @@ The dataset files are 2.5GB total — too large to upload to GitHub. We created 
 - Step 7: Pushed code to GitHub
 Pushed the updated model/train.py, requirements.txt and .gitignore to GitHub with the commit message "Day 2: data loading function complete, 2917 samples".
 
+<<<<<<< HEAD
+=======
+## Day 3
+### Goal of Day 3
+Write the audio preprocessing function, write the Whisper fine-tuning 
+training loop, and run training on a free cloud GPU overnight.
+
+### **What is Preprocessing?**
+Before the AI model can learn from audio, the raw .wav files need to be 
+converted into a format Whisper understands. This is called preprocessing:
+
+1. Load the audio file using librosa
+2. Resample to 16000Hz (16kHz) — Whisper requires this exact sample rate
+3. Extract log-Mel features using Whisper's own processor — this converts 
+   the audio waveform into a visual representation of sound frequencies 
+   that the model can learn from
+
+This is a lossless conversion — no information is lost, just reformatted.
+
+### **What is Fine-Tuning?**
+Whisper is already pre-trained on 680,000 hours of normal speech. 
+Fine-tuning means we take this already-smart model and teach it the 
+specific patterns of dysarthric speech using our TORGO dataset. Think 
+of it like a doctor who already knows medicine, now specialising in 
+a specific condition.
+
+### **What is Loss?**
+During training, the model makes a prediction for each audio file and 
+compares it to the correct transcript. The difference between the 
+prediction and the correct answer is called loss:
+
+- High loss = model got it very wrong
+- Low loss = model got it right
+- The goal is to reduce loss over time through 10 epochs of training
+
+### **What is an Epoch?**
+One epoch means the model has seen all 2917 samples once. We run 
+10 epochs — so the model sees the full dataset 10 times, getting 
+better each time.
+
+### **Why Google Colab and Kaggle?**
+Training a deep learning model requires a GPU (Graphics Processing Unit) 
+which is extremely expensive hardware. Our laptops don't have one. 
+Google Colab and Kaggle both offer free cloud GPUs:
+
+- Google Colab — free Tesla T4 GPU, ~12 hours per day
+- Kaggle — free Tesla T4 x2 GPU, 30 hours per week
+
+We used Colab for epochs 1-6 and switched to Kaggle for epochs 7-10 
+after hitting Colab's daily GPU limit.
+
+### **Steps Completed**
+
+- Step 1: Added preprocessing function to model/train.py
+  Loads each .wav file, resamples to 16kHz, extracts Mel features 
+  using WhisperProcessor
+
+- Step 2: Added training loop to model/train.py
+  Loads whisper-small from HuggingFace, moves it to GPU, runs 10 epochs,
+  saves checkpoints every 2 epochs so progress is not lost if 
+  GPU disconnects
+
+- Step 3: Set up Google Colab
+  Created new notebook, switched runtime to T4 GPU, mounted Google Drive,
+  uploaded TORGO dataset to Drive, ran training
+
+- Step 4: Training ran epochs 1-6 on Colab
+  Loss dropped from 2.69 → 0.0001 showing significant learning.
+  Checkpoint saved to Google Drive after every 2 epochs.
+
+- Step 5: Colab GPU limit hit after epoch 6
+  Free Colab GPU has a daily usage limit. Switched to Kaggle 
+  to continue training.
+
+- Step 6: Set up Kaggle notebook
+  Uploaded TORGO dataset and epoch 6 checkpoint to Kaggle as a dataset.
+  Switched accelerator to T4 x2 GPU. Loaded checkpoint and resumed 
+  training from epoch 7.
+
+- Step 7: Training resumed on Kaggle from epoch 7
+  Epochs 7, 8, 9, 10 running on Kaggle GPU.
+  Final model will be saved to /kaggle/working/dysvoice_whisper.pt
+
+## Day 4
+
+### **Goal of Day 4**
+Download the trained model from Kaggle, write model/evaluate.py to test 
+accuracy, and share the model file with teammates.
+
+### **What is Evaluation?**
+After training, we need to verify the model actually works on speech it 
+has never heard before. We test on two TORGO speakers who were not used 
+during training:
+
+- **M04** — male dysarthric speaker (mild/moderate)
+- **F03** — female dysarthric speaker (moderate)
+
+Testing on unseen data gives us a realistic measure of how the model 
+will perform in the real world.
+
+### **What is WRA and WER?**
+Two metrics are used to measure speech recognition accuracy:
+
+- **WRA (Word Recognition Accuracy)** — percentage of words the model 
+  gets correct. Higher is better. Target: 85%+
+- **WER (Word Error Rate)** — percentage of words the model gets wrong. 
+  Lower is better. WER = 1 - WRA
+
+These are calculated automatically using the `jiwer` library by comparing 
+the model's predicted transcript against the correct transcript.
+
+### **Steps Completed**
+
+- Step 1: Downloaded trained model from Kaggle Output section
+  After Version #2 completed all 10 epochs, downloaded 
+  dysvoice_whisper.pt (967MB) from the Kaggle Output tab
+
+- Step 2: Placed model in correct location
+  Saved dysvoice_whisper.pt to model/ folder inside the Dysvoice project
+
+- Step 3: Wrote model/evaluate.py
+  This file does the following:
+  1. Loads the trained model and Whisper processor
+  2. Loads test audio files from M04 and F03 speakers
+  3. Runs each audio file through the model to get predicted text
+  4. Compares predicted text against correct transcript
+  5. Calculates WRA and WER using jiwer library
+  6. Prints results with an example showing actual vs predicted text
+
+- Step 4: Ran evaluation and confirmed accuracy
+  Results exceeded the 85% target significantly:
+
+### **Accuracy Results**
+| Speaker | Severity | WRA | WER | Samples Tested |
+|---------|----------|-----|-----|----------------|
+| M04 | Mild/Moderate | 96.30% | 3.70% | 10 |
+| F03 | Moderate | 100.00% | 0.00% | 10 |
+
+**Target was 85% — model achieved 96-100%** ✅
+
+### **Model File**
+The trained model file dysvoice_whisper.pt is 967MB — too large for 
+GitHub. Download it from Google Drive:
+https://drive.google.com/drive/folders/1rtKe_JsFFLvp0zqZ8ohyRvxXvRcqMYD2?usp=sharing
+
+Place it in the model/ folder before running any code:
+```
+Dysvoice/
+└── model/
+    └── dysvoice_whisper.pt  ← place here
+```
+>>>>>>> 7ed49f138a2e6784649d97290099202df8e8f1db
 
 
 # DEVELOPER 2:
@@ -201,3 +353,24 @@ Ran python -m inference.transcribe test_samples\array0001.wav in the terminal. C
 Pushed inference/transcribe.py and the updated .gitignore with commit message "Day 4: transcribe.py complete, tested with TORGO samples".
 
 # DEVELOPER 3:
+<<<<<<< HEAD
+=======
+
+
+## Day 1
+
+- Step 1: Cloned the GitHub Repository
+   Once Person 1 shared the repository link, cloned it to the laptop using `git clone`. This downloaded the entire project folder including `config.py`, `requirements.txt`, and all the empty placeholder files Developer 1 had already created — including the `output/` folder where `speak.py` and `display.py` will live.
+
+- Step 2: Installed all libraries
+   Ran `pip install -r requirements.txt` in the terminal. This automatically downloaded and installed every library the project needs — `pyttsx3` for text-to-speech output, `librosa` for loading `.wav` files in demo mode, `argparse` for command-line arguments in `main.py`, and all other dependencies in one command.
+
+- Step 3: Wrote speak.py
+   Spent the remainder of Day 1 writing `output/speak.py` entirely. Used `pyttsx3` to convert text strings to spoken audio. Configured the speech rate and volume using the shared values from `config.py` (`TTS_RATE = 150`, `TTS_VOLUME = 1.0`). Wrote two functions — `speak()` which takes a string and plays it aloud, and `save_audio()` which saves the TTS output to a `.wav` file for use as a demo backup.
+
+- Step 4: Tested speak.py on the laptop
+  Ran `speak.py` directly from the terminal. Tested it with multiple sentences — *"please bring me water"*, *"turn off the lights"*, *"I need help"* — and confirmed that each sentence was spoken clearly through the laptop speakers. Adjusted the speech rate to sound natural and not robotic. Also confirmed that `save_audio()` successfully saved a `.wav` file to disk.
+
+- Step 5: Pushed to GitHub
+   Ran `git add .`, `git commit -m "Day 1 Speak complete"`, and `git push` to upload the completed `speak.py` to the shared repository so the team can see progress.
+>>>>>>> 7ed49f138a2e6784649d97290099202df8e8f1db

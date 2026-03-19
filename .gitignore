@@ -1,14 +1,24 @@
-__pycache__/
-<<<<<<< HEAD
+# Python
 *.pyc
 *.pyo
 *.pyd
-.env
+__pycache__/
+
+# Dataset files
+F_dys/
+M_dys/
+*.bz2
+*.tar
+*.zip
+
+# Audio test files
 test_recording.wav
 test_raw.wav
 test_clean.wav
-=======
-*.pyc__pycache__/ 
-*.pyc 
->>>>>>> 23cff3ac9562f703825559b5beefe914aaa0f426
 test_samples/
+
+# Model files
+*.pt
+
+# Environment
+.env

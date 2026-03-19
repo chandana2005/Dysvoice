@@ -7,18 +7,20 @@ Works offline on Windows (SAPI5), Mac (nsss), and Linux/Pi (espeak).
 """
 
 import pyttsx3
-import wave
-import numpy as np
-import tempfile
 import os
-
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 
 
 def _get_engine():
-    """Initialise and configure the pyttsx3 TTS engine."""
+    """
+    Initialise and configure the pyttsx3 TTS engine with settings from config.py.
+
+    Returns:
+        pyttsx3.Engine: A configured TTS engine instance.
+    """
     engine = pyttsx3.init()
     engine.setProperty('rate', config.TTS_RATE)
     engine.setProperty('volume', config.TTS_VOLUME)
@@ -42,7 +44,6 @@ def speak(text: str) -> None:
         return
 
     engine = _get_engine()
-    print(f"Speaking output: {text}")
     engine.say(text)
     engine.runAndWait()
     engine.stop()
@@ -52,12 +53,13 @@ def save_audio(text: str, output_path: str) -> str:
     """
     Save TTS output to a .wav file instead of playing it aloud.
 
-    Useful for pre-generating demo audio or logging output.
+    Useful for pre-generating demo audio clips or as a backup
+    if live TTS fails on demo day.
 
     Args:
         text (str):        The text to convert to speech.
-        output_path (str): File path where the .wav file will be saved.
-                           E.g. 'output/demo_clip.wav'
+        output_path (str): File path where the .wav will be saved.
+                           Example: 'output/demo_clip.wav'
 
     Returns:
         str: The path of the saved .wav file.
@@ -76,25 +78,18 @@ def save_audio(text: str, output_path: str) -> str:
 
 # ── Quick test ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    test_sentences = [
-        "please bring me water",
-        "turn off the lights",
-        "I need help",
-        "DysVoice is ready",
-    ]
+    print("=== speak.py test ===\n")
 
-    print("=== speak.py test ===")
-    print("Testing speak() with multiple sentences...\n")
+    print("Testing speak()...")
+    speak("please bring me water")
+    speak("turn off the lights")
+    print("  speak() tests done.\n")
 
-    for sentence in test_sentences:
-        print(f"  → '{sentence}'")
-        speak(sentence)
-
-    print("\nTesting save_audio()...")
-    saved = save_audio("This audio was saved to a file.", "test_output.wav")
-    if os.path.exists(saved):
-        print(f"  ✓ File created: {saved} ({os.path.getsize(saved)} bytes)")
+    print("Testing save_audio()...")
+    path = save_audio("This is a saved audio clip for the demo.", "test_output.wav")
+    if os.path.exists(path):
+        print(f"  ✓ File saved: {path} ({os.path.getsize(path)} bytes)")
     else:
-        print("  ✗ File was not created — check pyttsx3 save support on your OS.")
+        print("  ✗ File not created — known issue on some macOS versions.")
 
-    print("\n=== All tests complete ===")
+    print("\n=== speak.py tests complete ===")

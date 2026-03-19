@@ -1,11 +1,14 @@
-```
-F_dys/
-M_dys/
-F_dys.bz2
-M_tar.bz2
-*.wav
-*.bz2
-*.tar
 __pycache__/
+<<<<<<< HEAD
+*.pyc
+*.pyo
+*.pyd
+.env
+test_recording.wav
+test_raw.wav
+test_clean.wav
+=======
 *.pyc__pycache__/ 
 *.pyc 
+>>>>>>> 23cff3ac9562f703825559b5beefe914aaa0f426
+test_samples/

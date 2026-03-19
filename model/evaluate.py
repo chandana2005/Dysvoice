@@ -1,3 +1,5 @@
+import sys
+sys.path.append(r"C:\Users\chand\Desktop\Dysvoice")
 import os
 import re
 import torch
@@ -18,7 +20,11 @@ def transcribe_audio(wav_path, model, processor):
     audio, _ = librosa.load(wav_path, sr=config.SAMPLE_RATE)
     inputs = processor(audio, sampling_rate=config.SAMPLE_RATE, return_tensors="pt")
     with torch.no_grad():
-        predicted_ids = model.generate(inputs.input_features)
+        predicted_ids = predicted_ids = model.generate(
+    inputs.input_features,
+    language="en",
+    attention_mask=torch.ones(inputs.input_features.shape[:2], dtype=torch.long)
+)
     transcript = processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
     return transcript.strip()
 
@@ -53,9 +59,12 @@ def evaluate_speaker(speaker_path, model, processor):
         try:
             predicted = transcribe_audio(wav_full, model, processor)
             results.append((transcript, predicted))
+            if len(results) >= 10:
+                break
         except:
             continue
     
+
     return results
 
 def calculate_accuracy(results):

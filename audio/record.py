@@ -77,15 +77,7 @@ def record_audio() -> np.ndarray:
     """
     pa = pyaudio.PyAudio()
 
-    stream = pa.open(
-        format=SAMPLE_RATE and FORMAT,  # just FORMAT
-        channels=CHANNELS,
-        rate=SAMPLE_RATE,
-        input=True,
-        frames_per_buffer=CHUNK,
-    )
-    # ↑ Fix the accidental short-circuit above:
-    stream.close()
+    
     stream = pa.open(
         format=FORMAT,
         channels=CHANNELS,

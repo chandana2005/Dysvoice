@@ -34,19 +34,37 @@ _model.eval()
 _model.config.forced_decoder_ids = None
 _processor.tokenizer.forced_decoder_ids = None
 
-def transcribe(audio):
+
+def transcribe(audio: np.ndarray) -> str:
+    """
+    Transcribe a numpy audio array to text using Whisper.
+
+    Parameters
+    ----------
+    audio : np.ndarray
+        1-D float32 array of audio samples at 16000 Hz.
+        This is the output of denoise_audio() from audio/denoise.py.
+
+    Returns
+    -------
+    str
+        Transcribed text e.g. 'bring me water'.
+        Returns empty string if audio is empty or transcription fails.
+    """
     if audio.size == 0:
         return ""
     try:
         inputs = _processor(audio, sampling_rate=SAMPLE_RATE, return_tensors="pt")
         input_features = inputs.input_features.to(DEVICE)
+        attention_mask = torch.ones(input_features.shape[:2], dtype=torch.long).to(DEVICE)
         with torch.no_grad():
-            predicted_ids = _model.generate(input_features)
+            predicted_ids = _model.generate(input_features, attention_mask=attention_mask)
         text = _processor.batch_decode(predicted_ids, skip_special_tokens=True)
         return text[0].strip()
     except Exception as e:
         print(f"[transcribe] Error: {e}")
         return ""
+
 
 if __name__ == "__main__":
     import sys

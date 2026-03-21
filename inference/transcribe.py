@@ -2,6 +2,10 @@ import os
 import numpy as np
 import torch
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
+import warnings
+import logging
+warnings.filterwarnings("ignore")
+logging.disable(logging.WARNING)
 
 try:
     import config
@@ -32,8 +36,9 @@ else:
 _model.to(DEVICE)
 _model.eval()
 _model.config.forced_decoder_ids = None
+_model.generation_config.forced_decoder_ids = None
+_model.generation_config.suppress_tokens = []
 _processor.tokenizer.forced_decoder_ids = None
-
 
 def transcribe(audio: np.ndarray) -> str:
     """
@@ -58,7 +63,12 @@ def transcribe(audio: np.ndarray) -> str:
         input_features = inputs.input_features.to(DEVICE)
         attention_mask = torch.ones(input_features.shape[:2], dtype=torch.long).to(DEVICE)
         with torch.no_grad():
-            predicted_ids = _model.generate(input_features, attention_mask=attention_mask)
+            predicted_ids = _model.generate(
+            input_features,
+            attention_mask=attention_mask,
+            language="en",
+            task="transcribe",
+            )
         text = _processor.batch_decode(predicted_ids, skip_special_tokens=True)
         return text[0].strip()
     except Exception as e:

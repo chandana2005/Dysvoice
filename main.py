@@ -77,6 +77,15 @@ def run_pipeline(audio_array):
     print("Speaking output...")
     speak(text)
 
+    # Ask if user wants to replay
+    while True:
+        replay = input("\nPress 'r' to replay | Press Enter to continue: ").strip().lower()
+        if replay == "r":
+            print("Replaying...")
+            speak(text)
+        else:
+            break
+
     return text
 
 

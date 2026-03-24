@@ -14,6 +14,8 @@ def load_model():
     model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-small")
     model.load_state_dict(torch.load(config.MODEL_PATH, map_location=config.DEVICE))
     model.eval()
+    model.config.forced_decoder_ids = None
+    processor.tokenizer.forced_decoder_ids = None
     return model, processor
 
 def transcribe_audio(wav_path, model, processor):
@@ -59,7 +61,7 @@ def evaluate_speaker(speaker_path, model, processor):
         try:
             predicted = transcribe_audio(wav_full, model, processor)
             results.append((transcript, predicted))
-            if len(results) >= 10:
+            if len(results) >= 50:
                 break
         except:
             continue

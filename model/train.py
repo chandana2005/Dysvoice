@@ -1,12 +1,13 @@
 import os
+import re
 import librosa
 import numpy as np
-import librosa
+import config
 import torch
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
-TORGO_PATH = r"C:\Users\chand\Desktop\Dysvoice"
-SAMPLE_RATE = 16000
+TORGO_PATH = config.TORGO_PATH
+SAMPLE_RATE = config.SAMPLE_RATE
 
 def load_torgo_data(base_path):
     data = []

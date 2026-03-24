@@ -22,7 +22,7 @@ def transcribe_audio(wav_path, model, processor):
     audio, _ = librosa.load(wav_path, sr=config.SAMPLE_RATE)
     inputs = processor(audio, sampling_rate=config.SAMPLE_RATE, return_tensors="pt")
     with torch.no_grad():
-        predicted_ids = predicted_ids = model.generate(
+        predicted_ids  = model.generate(
     inputs.input_features,
     language="en",
     attention_mask=torch.ones(inputs.input_features.shape[:2], dtype=torch.long)

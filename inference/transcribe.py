@@ -2,6 +2,10 @@ import os
 import numpy as np
 import torch
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
+import warnings
+import logging
+warnings.filterwarnings("ignore")
+logging.disable(logging.WARNING)
 
 try:
     import config
@@ -15,41 +19,67 @@ except ModuleNotFoundError:
     MODEL_PATH  = "model/dysvoice_whisper.pt"
     DEVICE      = "cpu"
 
-print("[transcribe] Loading processor...")
+print(f"[transcribe] Loading processor from {MODEL_NAME}")
 _processor = WhisperProcessor.from_pretrained(MODEL_NAME)
 
-print("[transcribe] Loading base model...")
+print(f"[transcribe] Loading base model architecture from {MODEL_NAME}")
 _model = WhisperForConditionalGeneration.from_pretrained(MODEL_NAME)
 
 if os.path.isfile(MODEL_PATH):
     print(f"[transcribe] Applying fine-tuned weights from {MODEL_PATH}")
     state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
     _model.load_state_dict(state_dict)
-    print("[transcribe] Fine-tuned model loaded successfully")
+    print(f"[transcribe] Fine-tuned model loaded successfully")
 else:
     print(f"[transcribe] WARNING - {MODEL_PATH} not found, using base model")
 
 _model.to(DEVICE)
 _model.eval()
+_model.config.forced_decoder_ids = None
+_model.generation_config.forced_decoder_ids = None
+_model.generation_config.suppress_tokens = []
+_processor.tokenizer.forced_decoder_ids = None
 
-def transcribe(audio):
+def transcribe(audio: np.ndarray) -> str:
+    """
+    Transcribe a numpy audio array to text using Whisper.
+
+    Parameters
+    ----------
+    audio : np.ndarray
+        1-D float32 array of audio samples at 16000 Hz.
+        This is the output of denoise_audio() from audio/denoise.py.
+
+    Returns
+    -------
+    str
+        Transcribed text e.g. 'bring me water'.
+        Returns empty string if audio is empty or transcription fails.
+    """
     if audio.size == 0:
         return ""
     try:
         inputs = _processor(audio, sampling_rate=SAMPLE_RATE, return_tensors="pt")
         input_features = inputs.input_features.to(DEVICE)
+        attention_mask = torch.ones(input_features.shape[:2], dtype=torch.long).to(DEVICE)
         with torch.no_grad():
-            predicted_ids = _model.generate(input_features)
+            predicted_ids = _model.generate(
+            input_features,
+            attention_mask=attention_mask,
+            language="en",
+            task="transcribe",
+            )
         text = _processor.batch_decode(predicted_ids, skip_special_tokens=True)
         return text[0].strip()
     except Exception as e:
         print(f"[transcribe] Error: {e}")
         return ""
 
+
 if __name__ == "__main__":
     import sys
     print("=" * 50)
-    print("transcribe.py - Whisper transcription test")
+    print("transcribe.py  -  Whisper transcription test")
     print("=" * 50)
     if len(sys.argv) > 1:
         import librosa

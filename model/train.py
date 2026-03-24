@@ -1,8 +1,8 @@
 import os
 import re
+import config
 import librosa
 import numpy as np
-import config
 import torch
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
 

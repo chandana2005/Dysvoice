@@ -40,8 +40,8 @@ FORMAT        = pyaudio.paInt16
 # ── VAD tuning ────────────────────────────────────────────────────────────────
 # Raise SILENCE_THRESHOLD if the mic picks up too much background noise.
 # Lower it if speech is not being detected.
-SILENCE_THRESHOLD  = 300    # RMS amplitude below this = silence (0–32767 scale)
-SILENCE_DURATION   = 1.5    # seconds of silence before recording stops
+SILENCE_THRESHOLD  = 50   # RMS amplitude below this = silence (0–32767 scale)
+SILENCE_DURATION   = 3.0   # seconds of silence before recording stops
 SILENCE_CHUNKS     = int(SILENCE_DURATION * SAMPLE_RATE / CHUNK)  # ≈ 47 chunks
 
 # Minimum speech length to be returned (avoids returning a tiny noise burst)

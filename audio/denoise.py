@@ -39,7 +39,7 @@ def denoise_audio(audio: np.ndarray) -> np.ndarray:
 
     # Step 1: Noise reduction
     # noisereduce estimates the noise profile from the audio itself
-    reduced = nr.reduce_noise(y=audio, sr=SAMPLE_RATE)
+    reduced = nr.reduce_noise(y=audio, sr=SAMPLE_RATE, prop_decrease=1.0, stationary=True)
 
     # Step 2: Normalise amplitude to [-1.0, 1.0]
     # This ensures quiet speakers are amplified and loud speakers don't clip

@@ -24,6 +24,7 @@ from output.speak import speak
 from output.display import display_text
 
 
+
 # ── Pipeline ──────────────────────────────────────────────────────────────────
 
 def run_pipeline(audio_array):
@@ -64,7 +65,10 @@ def run_pipeline(audio_array):
     text = transcribe(clean)
 
     # Step 3: Handle empty transcript
-    if not text or not text.strip():
+    bad_patterns = ["/", "\\", ".jpg", ".png", ".mp4", "http", "www", "subscribe", "copyright", "subtitles", "caption"]
+    is_hallucination = any(p in text.lower() for p in bad_patterns)
+
+    if not text or not text.strip() or is_hallucination:
         fallback = "Could not understand, please repeat"
         print("Transcript: (empty) — speaking fallback message")
         display_text(fallback)

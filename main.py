@@ -118,19 +118,34 @@ def main():
         run_pipeline(audio)
 
     else:
-        # ── Live mic mode: loop until Ctrl+C ─────────────────────────────────
-        print("\nDysVoice ready.")
-        print("Press Enter to start listening. Press Ctrl+C to quit.\n")
+        # ── Live mic mode: GPIO button on Pi, Enter key on laptop ─────────────
+        try:
+            import RPi.GPIO as GPIO
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            USE_GPIO = True
+            print("\nDysVoice ready. Press the button to start listening.")
+            print("Press Ctrl+C to quit.\n")
+        except (ImportError, RuntimeError):
+            USE_GPIO = False
+            print("\nDysVoice ready (laptop mode).")
+            print("Press Enter to start listening. Press Ctrl+C to quit.\n")
 
         while True:
             try:
-                input()
+                if USE_GPIO:
+                    GPIO.wait_for_edge(17, GPIO.FALLING)
+                else:
+                    input()
+
                 print("Listening...")
                 audio = record_audio()
                 run_pipeline(audio)
                 print()
 
             except KeyboardInterrupt:
+                if USE_GPIO:
+                    GPIO.cleanup()
                 print("\nDysVoice stopped. Goodbye.")
                 sys.exit(0)
 

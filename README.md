@@ -53,10 +53,10 @@ Model evaluated on TORGO speakers not seen during training:
  
 | Speaker | Severity | WRA | WER | Samples Tested |
 |---------|----------|-----|-----|----------------|
-| M04 | Mild/Moderate | 96.30% | 3.70% | 10 |
-| F03 | Moderate | 100.00% | 0.00% | 10 |
+| M04 | Mild/Moderate | 95.54% | 4.46% | 50 |
+| F03 | Moderate | 97.20% | 2.80% | 50 |
  
-**Target was 85% — model achieved 96–100%** ✅
+**Target was 85% — model achieved 95–97%** ✅
  
 ---
  

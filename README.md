@@ -398,80 +398,69 @@ Whisper is a speech recognition model created by OpenAI. It was trained on 680,0
 - **Step 3:** Ran `pip install transformers torch` in the terminal. The first run also downloaded the Whisper small model (~460MB) which took 2–3 minutes
 - **Step 4:** Tested with TORGO `.wav` files by running `python -m inference.transcribe test_samples\array0001.wav`. Compared the printed transcript against the matching `.txt` file. Accuracy at this stage is ~50–60% because the base Whisper model has not been fine-tuned on dysarthric speech yet — this is expected and will improve significantly on Day 5 when the fine-tuned model is integrated
 - **Step 5:** Pushed `inference/transcribe.py` and the updated `.gitignore` with commit message `"Day 4: transcribe.py complete, tested with TORGO samples"`
- 
+
 ---
 
 ## Day 5
 
-## Goal
-Pull the fine-tuned model pushed by Developer 1, integrate it into inference/transcribe.py, and run the full live pipeline for the first time — microphone recording to denoising to real Whisper transcription to text output — confirming all three modules work together end to end.
+### Goal
+Pull the fine-tuned model pushed by Developer 1, integrate it into `inference/transcribe.py`, and run the full live pipeline for the first time — microphone recording to denoising to real Whisper transcription to text output — confirming all three modules work together end to end.
+
 ### What changed from Day 4?
-On Day 4, transcribe.py was using the base openai/whisper-small model as a placeholder because Developer 1's fine-tuned model was not ready yet. On Day 5, Developer 1 pushed the trained dysvoice_whisper.pt file to Google Drive and shared the download link. The model loading code in transcribe.py was updated to load Developer 1's fine-tuned weights on top of the base Whisper architecture using torch.load() and model.load_state_dict(). This is called transfer learning integration — the model structure stays the same but the learned weights are replaced with the dysarthric-specific ones.
-Steps Completed
+On Day 4, `transcribe.py` was using the base `openai/whisper-small` model as a placeholder because Developer 1's fine-tuned model was not ready yet. On Day 5, Developer 1 pushed the trained `dysvoice_whisper.pt` file to Google Drive and shared the download link. The model loading code in `transcribe.py` was updated to load Developer 1's fine-tuned weights on top of the base Whisper architecture using `torch.load()` and `model.load_state_dict()`. This is called transfer learning integration — the model structure stays the same but the learned weights are replaced with the dysarthric-specific ones.
 
-## Step 1: 
-Ran git pull to get the latest code from the repository. Received Developer 1's model/test_model.py and Developer 3's latest main.py updates
-## Step 2:
- Downloaded dysvoice_whisper.pt (967MB) from the Google Drive link shared by Developer 1 on WhatsApp. Placed the file in the model/ folder:
+### Steps Completed
 
-  Dysvoice/
-  └── model/
-      └── dysvoice_whisper.pt
-
-## Step 3: 
-Rewrote inference/transcribe.py with Developer 1's exact model loading method:
-
-Load WhisperProcessor from the base openai/whisper-small model on HuggingFace
-Load WhisperForConditionalGeneration base architecture from HuggingFace
-Load the fine-tuned weights from model/dysvoice_whisper.pt using torch.load() with map_location=config.DEVICE
-Apply the weights to the model using model.load_state_dict(state_dict)
-Move the model to the correct device using model.to(config.DEVICE)
-Set model to evaluation mode using model.eval()
-Clear forced decoder settings using model.config.forced_decoder_ids = None and processor.tokenizer.forced_decoder_ids = None
-
-
-## Step 4: 
-Tested with TORGO .wav files — confirmed the terminal printed:
-
+- **Step 1:** Ran `git pull` to get the latest code from the repository. Received Developer 1's `model/test_model.py` and Developer 3's latest `main.py` updates
+- **Step 2:** Downloaded `dysvoice_whisper.pt` (967MB) from the Google Drive link shared by Developer 1 on WhatsApp. Placed the file in the `model/` folder
+- **Step 3:** Rewrote `inference/transcribe.py` with Developer 1's exact model loading method:
+  1. Load `WhisperProcessor` from the base `openai/whisper-small` model on HuggingFace
+  2. Load `WhisperForConditionalGeneration` base architecture from HuggingFace
+  3. Load the fine-tuned weights from `model/dysvoice_whisper.pt` using `torch.load()` with `map_location=config.DEVICE`
+  4. Apply the weights to the model using `model.load_state_dict(state_dict)`
+  5. Move the model to the correct device using `model.to(config.DEVICE)`
+  6. Set model to evaluation mode using `model.eval()`
+  7. Clear forced decoder settings using `model.config.forced_decoder_ids = None` and `processor.tokenizer.forced_decoder_ids = None`
+- **Step 4:** Tested with TORGO `.wav` files — confirmed the terminal printed:
+  ```
   [transcribe] Loading processor from openai/whisper-small
   [transcribe] Loading base model architecture from openai/whisper-small
   [transcribe] Applying fine-tuned weights from model/dysvoice_whisper.pt
   [transcribe] Fine-tuned model loaded successfully
   Transcript: 'I can play this weekend.'
   Test PASSED — transcribe() returned a string successfully.
-
-## Step 5: 
-Ran the full live pipeline for the first time connecting all three modules together:
-
-python  audio = record_audio()      # mic → numpy array
+  ```
+- **Step 5:** Ran the full live pipeline for the first time connecting all three modules together:
+  ```python
+  audio = record_audio()       # mic → numpy array
   clean = denoise_audio(audio) # numpy array → cleaned array
   text  = transcribe(clean)    # cleaned array → text string
-Spoke into the microphone, confirmed the system printed Listening..., then Recording..., then Done., then printed the final transcript. The full chain worked end to end on a live microphone input
-
-## Step 6: 
-Encountered and resolved a ModuleNotFoundError: No module named 'noisereduce' on this machine — fixed by running pip install noisereduce
-## Step 7:
- Noticed test_output.wav was accidentally pushed to GitHub. Removed it using git rm --cached test_output.wav, added it to .gitignore, and pushed the fix
-## Step 8: 
-Developer 1 flagged two lines to add after model.eval() to fix decoder warnings:
-
-python  _model.config.forced_decoder_ids = None
+  ```
+  Spoke into the microphone, confirmed the system printed `Listening...`, then `Recording...`, then `Done.`, then printed the final transcript. The full chain worked end to end on a live microphone input
+- **Step 6:** Encountered and resolved a `ModuleNotFoundError: No module named 'noisereduce'` on this machine — fixed by running `pip install noisereduce`
+- **Step 7:** Noticed `test_output.wav` was accidentally pushed to GitHub. Removed it using `git rm --cached test_output.wav`, added it to `.gitignore`, and pushed the fix
+- **Step 8:** Developer 1 flagged two lines to add after `model.eval()` to fix decoder warnings. Added these lines to `inference/transcribe.py` to suppress the `forced_decoder_ids` conflict warnings that appeared during transcription:
+  ```python
+  _model.config.forced_decoder_ids = None
   _processor.tokenizer.forced_decoder_ids = None
-```
-  Added these lines to `inference/transcribe.py` to suppress the `forced_decoder_ids` conflict warnings that appeared during transcription
-  Step 9: Pushed all completed work to GitHub:
-```
+  ```
+- **Step 9:** Pushed all completed work to GitHub:
+  ```
   git add .
   git commit -m "Day 5: fine-tuned model integrated, full live pipeline tested successfully"
   git push
-```
+  ```
 - **Step 10:** Messaged Developer 3 on WhatsApp confirming all three functions are ready with their exact signatures:
-```
+  ```
   record_audio()        → returns numpy array
   denoise_audio(audio)  → returns numpy array
   transcribe(audio)     → returns string
-## Result
-Full pipeline working end to end. Fine-tuned model loads successfully and returns transcriptions. Live microphone input flows correctly through all three modules — record.py → denoise.py → transcribe.py — and produces a text string output ready for Developer 3's speak() and display_text() functions in main.py.
+  ```
+
+### Result
+Full pipeline working end to end. Fine-tuned model loads successfully and returns transcriptions. Live microphone input flows correctly through all three modules — `record.py` → `denoise.py` → `transcribe.py` — and produces a text string output ready for Developer 3's `speak()` and `display_text()` functions in `main.py`.
+
+---
  
 # Developer 3 — Output & Integration
  
@@ -523,5 +512,93 @@ The OLED screen is a small physical display that will be attached to the Raspber
  
 ### Result
 Both output modules are complete and pushed. `speak.py` has clean, tested function signatures ready for `main.py` to call. `display.py` works in terminal mode now and is structured to switch to OLED with a single flag change when hardware arrives. Developer 3 can now move on to writing `main.py` on Day 3 with both output modules fully in place.
- 
+
 ---
+
+## Day 3
+
+### Goal
+Start writing `main.py` — the most important file in the entire project. Day 3 version focuses on getting the skeleton structure right with the main loop, imports, and dummy function stubs so the overall flow can be tested even before all modules are ready.
+
+### What is main.py?
+`main.py` is the controller script that connects all three developers' modules together into one working product. It is the file that will be running on the Raspberry Pi on demo day. It calls `record_audio()`, `denoise_audio()`, `transcribe()`, `speak()`, and `display_text()` in sequence — one after another — every time the user wants to say something.
+
+### Steps Completed
+
+- **Step 1:** Imported all three modules at the top of `main.py` — even though some are not fully ready yet. Used stub imports with placeholder functions so the file can run without crashing:
+  - `from audio.record import record_audio`
+  - `from audio.denoise import denoise_audio`
+  - `from inference.transcribe import transcribe`
+  - `from output.speak import speak`
+  - `from output.display import display_text`
+  - `import config, argparse, sys`
+- **Step 2:** Wrote the main loop structure inside `main.py`:
+  1. Wait for Enter key press
+  2. Call `record_audio()`
+  3. Call `denoise_audio()`
+  4. Call `transcribe()`
+  5. Call `speak()`
+  6. Call `display_text()`
+  7. Loop back to step 1
+- **Step 3:** Tested the skeleton with dummy functions — made `record_audio()` load a TORGO `.wav` file directly using `librosa` instead of recording from the mic, and made `transcribe()` return a hardcoded string like `"please bring me water"`. This let the loop run end to end without depending on Developer 1's model or Developer 2's mic code being ready
+- **Step 4:** Confirmed the loop runs without crashing — pressing Enter triggered the dummy pipeline, `speak()` said the hardcoded phrase aloud, `display_text()` printed the formatted box to the terminal
+- **Step 5:** Pushed `main.py` skeleton to GitHub with commit message `"Day 3: main.py skeleton with dummy functions, loop confirmed working"`
+
+---
+
+## Day 4
+
+### Goal
+Replace the dummy functions in `main.py` with real imports from Developer 2's modules — `record.py` and `denoise.py` are both ready and pushed. Keep `transcribe()` as a dummy for now since Developer 1's model is still training. Confirm the mic-to-speaker partial pipeline works on the laptop.
+
+### What is partial integration?
+Partial integration means connecting some modules with real code while keeping others as stubs. On Day 4, the goal is to confirm that the physical microphone and speaker work together in the pipeline — even if the transcription step is still returning dummy text. This is valuable because it catches audio device issues early, before the model is even involved.
+
+### Steps Completed
+
+- **Step 1:** Ran `git pull` to get Developer 2's latest `record.py` and `denoise.py`. Both were confirmed present and clean
+- **Step 2:** Replaced the dummy `record_audio()` stub in `main.py` with the real import from `audio.record`. Replaced the dummy `denoise_audio()` stub with the real import from `audio.denoise`
+- **Step 3:** Kept `transcribe()` as a dummy function returning a hardcoded string — Developer 1's model was still training on Kaggle at this point so the real `transcribe()` was not yet available
+- **Step 4:** Ran the partial pipeline on the laptop:
+  - Pressed Enter → terminal printed `Listening...`
+  - Spoke a sentence into the laptop mic → terminal printed `Recording...` then `Done.`
+  - Dummy transcribe returned `"please bring me water"`
+  - `speak()` said the phrase aloud through the laptop speakers ✅
+  - `display_text()` printed the formatted box to the terminal ✅
+- **Step 5:** Confirmed the mic and speaker work correctly together in the loop. Audio flows from the physical microphone through `record.py` and `denoise.py` and out through `speak.py` without any crashes or device errors
+- **Step 6:** Pushed updated `main.py` to GitHub with commit message `"Day 4: real record and denoise integrated in main.py, partial pipeline confirmed"`
+
+---
+
+## Day 5
+
+### Goal
+Complete `main.py` by adding the real `transcribe()` import now that Developer 1's fine-tuned model is available. Run the full pipeline live for the first time — microphone all the way to spoken TTS output using the actual Whisper model — and confirm the entire chain works end to end.
+
+### What is full integration?
+Full integration means all three developers' modules are connected with real code — no stubs, no dummy functions. The complete flow is: physical mic → noise reduction → fine-tuned Whisper model → spoken TTS output + terminal display. This is the first time the product works as intended from start to finish.
+
+### Steps Completed
+
+- **Step 1:** Ran `git pull` — received Developer 1's `model/test_model.py` and Developer 2's updated `inference/transcribe.py` with the fine-tuned model integrated
+- **Step 2:** Downloaded `dysvoice_whisper.pt` (967MB) from the Google Drive link shared by Developer 1 on WhatsApp. Placed it in the `model/` folder so `transcribe.py` can find it at `config.MODEL_PATH`
+- **Step 3:** Replaced the dummy `transcribe()` stub in `main.py` with the real import: `from inference.transcribe import transcribe`. The model loads automatically when this import runs — confirmed by the terminal printing `[transcribe] Fine-tuned model loaded successfully`
+- **Step 4:** Ran the full pipeline live for the first time:
+  - Pressed Enter → `Listening...`
+  - Spoke into the mic → `Recording...` then `Done.`
+  - `Processing audio...` printed while Whisper ran
+  - Real transcript printed and spoken aloud through speakers ✅
+  - Terminal display box showed the transcript ✅
+- **Step 5:** Tested using TORGO `.wav` files played through a speaker near the mic to simulate dysarthric input — transcripts came back correctly, confirming the fine-tuned model is working inside the full pipeline
+- **Step 6:** Messaged Developer 2 on WhatsApp confirming all three function signatures are stable and ready:
+  - `record_audio()` → returns numpy array
+  - `denoise_audio(audio)` → returns numpy array
+  - `transcribe(audio)` → returns string
+- **Step 7:** Pushed finalised `main.py` to GitHub with commit message `"Day 5: full pipeline connected in main.py, all three modules integrated"`
+
+### Result
+Full pipeline working end to end on the laptop. All three developers' modules are connected in `main.py` with real code. The product now works as intended — a person speaks, the system listens, transcribes using the fine-tuned dysarthric Whisper model, displays the text, and speaks it back. Ready for error handling and polish on Day 6.
+
+---
+
+*Git rule: always `git pull` before `git push`. Never edit a file that belongs to another developer.*
